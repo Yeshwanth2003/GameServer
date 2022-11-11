@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="container">
+    <div id="p1"></div>
+    <div id="p2"></div>
+  </div>
+  <button>Move</button>
+</body>
+<script>
+  const ws = new WebSocket("ws://192.168.144.168");
+  let container = document.querySelector("#container")
+  container.style.backgroundColor = "black";
+  container.style.width = 200+"px";
+  container.style.height = 400+"px";
+  let p1 = document.getElementById("p1")
+  let p2 = document.getElementById("p2")
+  p1.style.width = 20+"px"
+  p1.style.height = 40+"px"
+  p1.style.backgroundColor = "Blue"
+  p1.style.position = "relative";
+  p2.style.width = 20+"px"
+  p2.style.height = 40+"px"
+  p2.style.backgroundColor = "Red"
+  
+  p2.style.position = "relative";
+  p2.style.left =  (parseInt(container.style.width)-parseInt(p2.style.width))+"px" 
+  p2.style.bottom = (parseInt(p1.style.height)+"px")
+  console.log( container.style.width)
+
+  let button = document.querySelector("button")
+  let initialP = 0
+  p1.style.top = initialP+"px";
+  button.onclick = function(){
+    initialP+=20;
+    let data = initialP.toString()
+    ws.send(data)
+    if(initialP == (parseInt(container.style.height)-parseInt(p1.style.height))){
+      alert("End");
+      p1.style.top = 0+"px";
+      p2.style.top = 0+"px";
+      return;
+    }
+    p1.style.top = initialP+"px";
+  }
+
+  ws.onmessage = function(e){
+    let pos = parseInt(JSON.parse(e.data).data)-parseInt(p1.style.height);
+    console.log(pos)
+    if(pos == (parseInt(container.style.height)-(parseInt(p1.style.height)+40))){
+      alert("End");
+      p2.style.top = 0+"px";
+      p1.style.top = 0+"px";
+      return;
+    }
+    p2.style.top = pos+"px";
+  }
+</script>
+</html>
